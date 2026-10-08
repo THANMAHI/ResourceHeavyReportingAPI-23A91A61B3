@@ -1,0 +1,29 @@
+### Health Check
+GET http://localhost:8080/health
+
+### Get Initial Metrics (Expect 0)
+GET http://localhost:8080/api/metrics
+
+### List Available Reports (Lazy query - total_instantiations remains 0)
+GET http://localhost:8080/api/reports
+
+### Generate Report 3 (First time - instantiates heavy object, count becomes 1)
+GET http://localhost:8080/api/reports/report-3/generate?role=guest
+
+### Verify Metrics Counter (Expect 1)
+GET http://localhost:8080/api/metrics
+
+### Protection Proxy Denied - Unauthorized Role (Expect 403 Forbidden, count stays 1)
+GET http://localhost:8080/api/reports/report-1/generate?role=guest
+
+### Protection Proxy Granted - Authorized Admin (Expect 200 OK, count becomes 2)
+GET http://localhost:8080/api/reports/report-1/generate?role=admin
+
+### Verify Metrics Counter (Expect 2)
+GET http://localhost:8080/api/metrics
+
+### Reset Metrics Counter
+POST http://localhost:8080/api/metrics/reset
+
+### Non-existent Report (Expect 404 Not Found)
+GET http://localhost:8080/api/reports/non-existent/generate?role=admin
